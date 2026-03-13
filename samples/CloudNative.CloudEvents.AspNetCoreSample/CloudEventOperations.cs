@@ -2,13 +2,13 @@
 // Licensed under the Apache 2.0 license.
 // See LICENSE file in the project root for full license information.
 
-using CloudNative.CloudEvents.NewtonsoftJson;
+using CloudNative.CloudEvents.SystemTextJson;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CloudNative.CloudEvents.AspNetCoreSample
@@ -19,7 +19,7 @@ namespace CloudNative.CloudEvents.AspNetCoreSample
 
         public static async Task<JsonHttpResult<object>> ReceiveCloudEvent(CloudEventBinding cloudEvent)
         {
-            var data = (JObject) cloudEvent.Value.Data;
+            var data = (JsonElement) cloudEvent.Value.Data;
             var attributes = new Dictionary<string, string>();
             foreach (var (attribute, value) in cloudEvent.Value.GetPopulatedAttributes())
             {
@@ -28,7 +28,7 @@ namespace CloudNative.CloudEvents.AspNetCoreSample
 
             return TypedResults.Json<object>(new
             {
-                message = (string) data["message"],
+                message = data.GetProperty("message").GetString(),
                 version = cloudEvent.Value.SpecVersion.VersionId,
                 id = cloudEvent.Value.Id,
                 attributes

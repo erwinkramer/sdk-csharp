@@ -1,6 +1,6 @@
 using CloudNative.CloudEvents.AspNetCore;
 using CloudNative.CloudEvents.Core;
-using CloudNative.CloudEvents.NewtonsoftJson;
+using CloudNative.CloudEvents.SystemTextJson;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
 using System.Threading.Tasks;
