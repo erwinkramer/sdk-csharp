@@ -3,24 +3,20 @@
 // See LICENSE file in the project root for full license information.
 
 using CloudNative.CloudEvents.AspNetCore;
+using CloudNative.CloudEvents.AspNetCoreSample.Bindings;
 using CloudNative.CloudEvents.SystemTextJson;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace CloudNative.CloudEvents.AspNetCoreSample
+namespace CloudNative.CloudEvents.AspNetCoreSample.Operations
 {
-    public class CloudEventController
+    public class CloudEventOperations
     {
-        private static readonly CloudEventFormatter formatter = new JsonEventFormatter();
-
         public static async Task<JsonHttpResult<object>> ReceiveCloudEvent(CloudEventBinding cloudEvent)
         {
-            var data = (JsonElement) cloudEvent.Value.Data;
-            
             var attributes = new Dictionary<string, string>();
             foreach (var (attribute, value) in cloudEvent.Value.GetPopulatedAttributes())
             {
@@ -29,10 +25,11 @@ namespace CloudNative.CloudEvents.AspNetCoreSample
 
             return TypedResults.Json<object>(new
             {
-                message = data.GetProperty("message").GetString(),
-                version = cloudEvent.Value.SpecVersion.VersionId,
-                id = cloudEvent.Value.Id,
-                attributes
+                note = "wow, such event, much disassembling, very skill",
+                cloudEvent.Value.SpecVersion.VersionId,
+                cloudEvent.Value.Id,
+                attributes,
+                cloudEvent.Value.Data
             });
         }
 
@@ -40,7 +37,7 @@ namespace CloudNative.CloudEvents.AspNetCoreSample
         /// Generates a CloudEvent in "structured mode", where all CloudEvent information is
         /// included within the body of the response.
         /// </summary>
-        public static async Task GenerateCloudEvent(HttpResponse response)
+        public static async Task GenerateCloudEvent(HttpResponse response, JsonEventFormatter formatter)
         {
             var evt = new CloudEvent
             {
