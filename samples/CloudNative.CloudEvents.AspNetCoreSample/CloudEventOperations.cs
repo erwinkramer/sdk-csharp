@@ -15,29 +15,34 @@ namespace CloudNative.CloudEvents.AspNetCoreSample.Operations
 {
     public class CloudEventOperations
     {
-        public static async Task<JsonHttpResult<object>> ReceiveCloudEvent(CloudEventBinding cloudEvent)
+        public static async Task<Results<ProblemHttpResult, JsonHttpResult<object>>> ReceiveCloudEvent(CloudEventBinding cloudEventBinding)
         {
-            var attributes = new Dictionary<string, string>();
-            foreach (var (attribute, value) in cloudEvent.Value.GetPopulatedAttributes())
+            if (cloudEventBinding.Error is not null)
             {
-                attributes[attribute.Name] = attribute.Format(value);
+                return cloudEventBinding.Error;
+            }
+
+            var cloudEvent = cloudEventBinding.Value;
+
+            var cloudEventAttributes = new Dictionary<string, string>();
+            foreach (var (attribute, attributeValue) in cloudEvent.GetPopulatedAttributes())
+            {
+                cloudEventAttributes[attribute.Name] = attribute.Format(attributeValue);
             }
 
             return TypedResults.Json<object>(new
             {
                 note = "wow, such event, much disassembling, very skill",
-                cloudEvent.Value.SpecVersion.VersionId,
-                cloudEvent.Value.Id,
-                attributes,
-                cloudEvent.Value.Data
+                cloudEvent.SpecVersion.VersionId,
+                cloudEventAttributes,
+                cloudEvent.Data
             });
         }
 
         /// <summary>
-        /// Generates a CloudEvent in "structured mode", where all CloudEvent information is
-        /// included within the body of the response.
+        /// Generates a CloudEvent.
         /// </summary>
-        public static async Task GenerateCloudEvent(HttpResponse response, JsonEventFormatter formatter)
+        public static async Task GenerateCloudEvent(HttpResponse response, JsonEventFormatter formatter, ContentMode contentMode = ContentMode.Structured)
         {
             var evt = new CloudEvent
             {
@@ -54,7 +59,7 @@ namespace CloudNative.CloudEvents.AspNetCoreSample.Operations
             };
 
             response.StatusCode = StatusCodes.Status200OK;
-            await evt.CopyToHttpResponseAsync(response, ContentMode.Structured, formatter);
+            await evt.CopyToHttpResponseAsync(response, contentMode, formatter);
         }
     }
 }
