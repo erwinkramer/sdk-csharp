@@ -4,17 +4,14 @@
 
 using CloudNative.CloudEvents.AspNetCoreSample;
 using Microsoft.AspNetCore.Builder;
-using CloudNative.CloudEvents.NewtonsoftJson;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(opts =>
-    opts.InputFormatters.Insert(0, new CloudEventJsonInputFormatter(new JsonEventFormatter())));
-
 var app = builder.Build();
 
-app.MapControllers();
+var apiEvents = app.MapGroup("/api/events");
+apiEvents.MapPost("/receive", CloudEventController.ReceiveCloudEvent);
+apiEvents.MapGet("/generate", CloudEventController.GenerateCloudEvent);
 
 app.Run();
 

@@ -3,37 +3,43 @@
 // See LICENSE file in the project root for full license information.
 
 using CloudNative.CloudEvents.NewtonsoftJson;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace CloudNative.CloudEvents.AspNetCoreSample.Controllers
+namespace CloudNative.CloudEvents.AspNetCoreSample
 {
-    [Route("api/events")]
-    [ApiController]
-    public class CloudEventController : ControllerBase
+    public class CloudEventController
     {
         private static readonly CloudEventFormatter formatter = new JsonEventFormatter();
 
-        [HttpPost("receive")]
-        public ActionResult<IEnumerable<string>> ReceiveCloudEvent([FromBody] CloudEvent cloudEvent)
+        public static async Task<JsonHttpResult<object>> ReceiveCloudEvent(CloudEventBinding cloudEvent)
         {
-            var attributeMap = new JObject();
-            foreach (var (attribute, value) in cloudEvent.GetPopulatedAttributes())
+            var data = (JObject) cloudEvent.Value.Data;
+            var attributes = new Dictionary<string, string>();
+            foreach (var (attribute, value) in cloudEvent.Value.GetPopulatedAttributes())
             {
-                attributeMap[attribute.Name] = attribute.Format(value);
+                attributes[attribute.Name] = attribute.Format(value);
             }
-            return Ok($"Received event with ID {cloudEvent.Id}, attributes: {attributeMap}");
+
+            return TypedResults.Json<object>(new
+            {
+                message = (string) data["message"],
+                version = cloudEvent.Value.SpecVersion.VersionId,
+                id = cloudEvent.Value.Id,
+                attributes
+            });
         }
 
         /// <summary>
         /// Generates a CloudEvent in "structured mode", where all CloudEvent information is
         /// included within the body of the response.
         /// </summary>
-        [HttpGet("generate")]
-        public ActionResult<string> GenerateCloudEvent()
+        public static async Task<ContentHttpResult> GenerateCloudEvent()
         {
             var evt = new CloudEvent
             {
@@ -48,19 +54,18 @@ namespace CloudNative.CloudEvents.AspNetCoreSample.Controllers
                     EnvironmentVersion = Environment.Version.ToString()
                 }
             };
+
             // Format the event as the body of the response. This is UTF-8 JSON because of
             // the CloudEventFormatter we're using, but EncodeStructuredModeMessage always
             // returns binary data. We could return the data directly, but for debugging
             // purposes it's useful to have the JSON string.
             var bytes = formatter.EncodeStructuredModeMessage(evt, out var contentType);
             string json = Encoding.UTF8.GetString(bytes.Span);
-            var result = Ok(json);
 
             // Specify the content type of the response: this is what makes it a CloudEvent.
             // (In "binary mode", the content type is the content type of the data, and headers
             // indicate that it's a CloudEvent.)
-            result.ContentTypes.Add(contentType.MediaType);
-            return result;
+            return TypedResults.Text(json, contentType.MediaType, statusCode: StatusCodes.Status200OK);
         }
     }
 }
