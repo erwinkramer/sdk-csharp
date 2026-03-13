@@ -4,9 +4,8 @@
 
 using CloudNative.CloudEvents;
 using CloudNative.CloudEvents.Http;
-using CloudNative.CloudEvents.NewtonsoftJson;
+using CloudNative.CloudEvents.SystemTextJson;
 using McMaster.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
@@ -38,7 +37,10 @@ namespace HttpSend
                 Type = Type,
                 Source = new Uri(Source),
                 DataContentType = MediaTypeNames.Application.Json,
-                Data = JsonConvert.SerializeObject("hey there!")
+                Data = new
+                {
+                    hey = "There"
+                }
             };
 
             var content = cloudEvent.ToHttpContent(ContentMode.Structured, new JsonEventFormatter());
