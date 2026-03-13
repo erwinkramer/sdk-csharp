@@ -26,7 +26,7 @@ public class CloudEventBinding : IBindableFromHttpContext<CloudEventBinding>
         // types such as "text/xml" could still be parsed with the current JsonEventFormatter,
         // but it's just not making it strongly typed, or anything structured (XmlNode).
         // Depending on your use-case, it may or may not be desirable to allow that.
-        if (!request.HasJsonContentType())
+        if (request.ContentLength != 0 && !request.HasJsonContentType())
         {
             return new CloudEventBinding
             {

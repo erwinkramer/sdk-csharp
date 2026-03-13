@@ -28,6 +28,14 @@ CE-Id: "{{$guid}}"
     "message": "Hello world!"
 }
 
+### Send content-less via Binary mode
+
+POST {{HostAddress}}/api/events/receive
+CE-SpecVersion: 1.0
+CE-Type: "com.example.myevent"
+CE-Source: "urn:example-com:mysource:abc"
+CE-Id: "{{$guid}}"
+
 ### Send unsupported media type (XML) via Binary mode
 
 POST {{HostAddress}}/api/events/receive
