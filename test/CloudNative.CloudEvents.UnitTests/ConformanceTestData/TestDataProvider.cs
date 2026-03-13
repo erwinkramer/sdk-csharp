@@ -49,7 +49,7 @@ internal class TestDataProvider
         var directory = new DirectoryInfo(currentDirectory);
         while (directory != null &&
             (!File.Exists(Path.Combine(directory.FullName, "LICENSE"))
-            || !File.Exists(Path.Combine(directory.FullName, "CloudEvents.sln"))))
+            || !File.Exists(Path.Combine(directory.FullName, "CloudEvents.slnx"))))
         {
             directory = directory.Parent;
         }
