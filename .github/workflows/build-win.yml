@@ -25,7 +25,7 @@ jobs:
 
       - name: Build
         run: |
-          dotnet build -f ${{ matrix.framework }} --exclude CloudNative.CloudEvents.AspNetCoreSample HttpSend
+          dotnet build -f ${{ matrix.framework }}
           dotnet test
           # Pack production packages to validate compatibility
           dotnet pack -p:ContinuousIntegrationBuild=true
