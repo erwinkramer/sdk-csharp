@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false # we want to see list of failing tests for each combination
       matrix:
-        framework: ['net481']
+        framework: [ "netstandard2.0" ]
 
     env:
       DOTNET_NOLOGO: true
