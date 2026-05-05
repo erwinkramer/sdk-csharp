@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
-            net481
+            4.8.x
 
       - name: Build
         run: |
