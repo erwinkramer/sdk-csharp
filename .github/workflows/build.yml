@@ -38,4 +38,4 @@ jobs:
         if: runner.os == 'Windows'
         run: dotnet test --no-build -f net48
 
-      - run: dotnet pack --no-build -p:ContinuousIntegrationBuild=true
+      - run: dotnet pack -p:ContinuousIntegrationBuild=true
