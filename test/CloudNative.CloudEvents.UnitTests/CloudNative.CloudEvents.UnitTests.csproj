@@ -42,10 +42,6 @@
     <ProjectReference Include="..\..\src\CloudNative.CloudEvents\CloudNative.CloudEvents.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != 'net48'">
-    <ProjectReference Include="..\..\src\CloudNative.CloudEvents.SystemTextJson\CloudNative.CloudEvents.SystemTextJson.csproj" />
-  </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="..\..\src\CloudNative.CloudEvents.Avro\AvroSchema.json" />
   </ItemGroup>
