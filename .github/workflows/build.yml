@@ -28,14 +28,14 @@ jobs:
 
       - run: dotnet build
 
+      - name: Test net48
+        if: runner.os == 'Windows'
+        run: dotnet test --no-build -f net48
+        
       - name: Test net8.0
         run: dotnet test --no-build -f net8.0
 
       - name: Test net10.0
         run: dotnet test --no-build -f net10.0
-
-      - name: Test net48
-        if: runner.os == 'Windows'
-        run: dotnet test --no-build -f net48
 
       - run: dotnet pack -p:ContinuousIntegrationBuild=true
